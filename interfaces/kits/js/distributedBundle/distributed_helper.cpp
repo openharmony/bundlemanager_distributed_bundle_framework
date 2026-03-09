@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,51 +21,27 @@
 #include "common_func.h"
 #include "distributed_bms_interface.h"
 #include "distributed_bms_proxy.h"
+#include "distributed_bundle_mgr_client.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
 namespace AppExecFwk {
-
-static OHOS::sptr<OHOS::AppExecFwk::IDistributedBms> GetDistributedBundleMgr()
-{
-    APP_LOGD("GetDistributedBundleMgr start");
-    auto samgr = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        APP_LOGE("GetDistributedBundleMgr samgr is nullptr");
-        return nullptr;
-    }
-    auto remoteObject = samgr->GetSystemAbility(OHOS::DISTRIBUTED_BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (remoteObject == nullptr) {
-        APP_LOGE("GetDistributedBundleMgr remoteObject is nullptr");
-        return nullptr;
-    }
-    auto distributeBundleMgr = OHOS::iface_cast<IDistributedBms>(remoteObject);
-    if (distributeBundleMgr == nullptr) {
-        APP_LOGE("GetDistributedBundleMgr distributeBundleMgr is nullptr");
-        return nullptr;
-    }
-    return distributeBundleMgr;
-}
-
 int32_t DistributedHelper::InnerGetRemoteAbilityInfo(const std::vector<ElementName> &elementNames,
     const std::string &locale, bool isArray, std::vector<RemoteAbilityInfo> &remoteAbilityInfos)
 {
     if (elementNames.size() == 0) {
-        APP_LOGE("InnerGetRemoteAbilityInfos elementNames is empty");
+        APP_LOGE("InnerGetRemoteAbilityInfo elementNames is empty");
         return ERROR_PARAM_CHECK_ERROR;
-    }
-    auto iDistBundleMgr = GetDistributedBundleMgr();
-    if (iDistBundleMgr == nullptr) {
-        APP_LOGE("can not get iDistBundleMgr");
-        return ERROR_DISTRIBUTED_SERVICE_NOT_RUNNING;
     }
     int32_t result;
     if (isArray) {
-        result = iDistBundleMgr->GetRemoteAbilityInfos(elementNames, locale, remoteAbilityInfos);
+        result = DistributedBundleMgrClient::GetInstance()->GetRemoteAbilityInfos(
+            elementNames, locale, remoteAbilityInfos);
     } else {
         RemoteAbilityInfo remoteAbilityInfo;
-        result = iDistBundleMgr->GetRemoteAbilityInfo(elementNames[0], locale, remoteAbilityInfo);
+        result = DistributedBundleMgrClient::GetInstance()->GetRemoteAbilityInfo(
+            elementNames[0], locale, remoteAbilityInfo);
         remoteAbilityInfos.push_back(remoteAbilityInfo);
     }
     if (result != 0) {
@@ -85,12 +61,8 @@ int32_t DistributedHelper::InnerGetRemoteBundleVersionCode(const std::string &de
         APP_LOGE("InnerGetRemoteBundleVersionCode bundleName is empty");
         return ERROR_PARAM_CHECK_ERROR;
     }
-    auto iDistBundleMgr = GetDistributedBundleMgr();
-    if (iDistBundleMgr == nullptr) {
-        APP_LOGE("can not get iDistBundleMgr");
-        return ERROR_DISTRIBUTED_SERVICE_NOT_RUNNING;
-    }
-    int32_t result = iDistBundleMgr->GetRemoteBundleVersionCode(deviceId, bundleName, versionCode);
+    int32_t result = DistributedBundleMgrClient::GetInstance()->GetRemoteBundleVersionCode(
+        deviceId, bundleName, versionCode);
     if (result != 0) {
         APP_LOGE("InnerGetRemoteBundleVersionCode failed");
     }
