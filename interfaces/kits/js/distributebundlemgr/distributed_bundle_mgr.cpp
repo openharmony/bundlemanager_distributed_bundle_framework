@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "bundle_constants.h"
 #include "distributed_bms_interface.h"
 #include "distributed_bms_proxy.h"
+#include "distributed_bundle_mgr_client.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
@@ -43,6 +44,7 @@ constexpr int32_t PARAM2 = 2;
 constexpr int32_t NAPI_RETURN_ZERO = 0;
 constexpr int32_t NAPI_RETURN_ONE = 1;
 constexpr int32_t GET_REMOTE_ABILITY_INFO_MAX_SIZE = 10;
+constexpr int32_t ERROR_DISTRIBUTED_SERVICE_NOT_RUNNING = 17700027;
 enum GetRemoteAbilityInfoErrorCode : int32_t {
     SUCCESS = 0,
     ERR_INNER_ERROR,
@@ -66,18 +68,6 @@ AsyncWorkData::~AsyncWorkData()
         napi_delete_async_work(env, asyncWork);
         asyncWork = nullptr;
     }
-}
-
-static OHOS::sptr<OHOS::AppExecFwk::IDistributedBms> GetDistributedBundleMgr()
-{
-    APP_LOGI("GetDistributedBundleMgr");
-    auto samgr = OHOS::SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        APP_LOGE("GetSystemAbilityManager failed, samgr is nullptr.");
-        return nullptr;
-    }
-    auto remoteObject = samgr->GetSystemAbility(OHOS::DISTRIBUTED_BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    return OHOS::iface_cast<IDistributedBms>(remoteObject);
 }
 
 static std::string GetStringFromNAPI(napi_env env, napi_value value)
@@ -290,12 +280,12 @@ static bool ParseElementNames(napi_env env, std::vector<ElementName> &elementNam
 static int32_t InnerGetRemoteAbilityInfo(
     const OHOS::AppExecFwk::ElementName &elementName, const std::string &locale, RemoteAbilityInfo &remoteAbilityInfo)
 {
-    auto iDistBundleMgr = GetDistributedBundleMgr();
-    if (!iDistBundleMgr) {
-        APP_LOGE("can not get iDistBundleMgr");
+    int32_t result = DistributedBundleMgrClient::GetInstance()->GetRemoteAbilityInfo(
+        elementName, locale, remoteAbilityInfo);
+    if (result == ERROR_DISTRIBUTED_SERVICE_NOT_RUNNING) {
+        APP_LOGE_NOFUNC("d-bms not running");
         return ERR_INNER_ERROR;
     }
-    int32_t result = iDistBundleMgr->GetRemoteAbilityInfo(elementName, locale, remoteAbilityInfo);
     if (result != 0) {
         APP_LOGE("InnerGetRemoteAbilityInfo failed");
     }
@@ -309,14 +299,14 @@ static int32_t InnerGetRemoteAbilityInfos(const std::vector<ElementName> &elemen
         APP_LOGE("InnerGetRemoteAbilityInfos elementNames is empty");
         return ERR_INVALID_PARAM;
     }
-    auto iDistBundleMgr = GetDistributedBundleMgr();
-    if (!iDistBundleMgr) {
-        APP_LOGE("can not get iDistBundleMgr");
+    int32_t result = DistributedBundleMgrClient::GetInstance()->GetRemoteAbilityInfos(
+        elementNames, locale, remoteAbilityInfos);
+    if (result == ERROR_DISTRIBUTED_SERVICE_NOT_RUNNING) {
+        APP_LOGE_NOFUNC("d-bms not running");
         return ERR_INNER_ERROR;
     }
-    int32_t result = iDistBundleMgr->GetRemoteAbilityInfos(elementNames, locale, remoteAbilityInfos);
     if (result != 0) {
-        APP_LOGE("InnerGetRemoteAbilityInfo failed");
+        APP_LOGE("InnerGetRemoteAbilityInfos failed");
     }
     return ConvertResultCode(result);
 }
