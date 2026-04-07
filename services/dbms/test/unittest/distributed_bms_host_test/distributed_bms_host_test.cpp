@@ -264,6 +264,7 @@ HWTEST_F(DistributedBmsHostTest, OnRemoteRequest_1000, Function | MediumTest | T
     int res = host.OnRemoteRequest(static_cast<uint32_t>
         (DistributedInterfaceCode::GET_ABILITY_INFOS_WITH_LOCALE), data, reply, option);
     EXPECT_EQ(res, NO_ERROR);
+    
 }
 
 /**
