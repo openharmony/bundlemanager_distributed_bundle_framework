@@ -252,8 +252,8 @@ bool DbmsServicesKitTest::InstallBundle(const std::string &bundlePath) const
     EXPECT_NE(statusReceiver, nullptr);
     bool result = installerProxy->Install(bundlePath, installParam, statusReceiver);
     EXPECT_EQ(statusReceiver->GetResultMsg(), OPERATION_SUCCESS);
+
     return result;
-    
 }
 
 bool DbmsServicesKitTest::UninstallBundle(const std::string &bundleName) const
