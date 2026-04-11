@@ -514,6 +514,9 @@ bool DistributedBms::GetDistributedBundleInfo(const std::string &networkId, cons
         APP_LOGE("verify GET_BUNDLE_INFO_PRIVILEGED failed");
         return ERR_BUNDLE_MANAGER_PERMISSION_DENIED;
     }
+    if (GetDistributedBundleMgr(networkId) == nullptr) {
+        APP_LOGW_NOFUNC("remote d-bms not running");
+    }
 #ifdef HICOLLIE_ENABLE
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("GetDistributedBundleInfo", LOCAL_TIME_OUT_SECONDS,
         nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_RECOVERY);
@@ -532,6 +535,9 @@ int32_t DistributedBms::GetDistributedBundleName(const std::string &networkId,  
     if (!VerifyCallingPermission(Constants::PERMISSION_GET_BUNDLE_INFO_PRIVILEGED)) {
         APP_LOGE("verify calling permission failed");
         return ERR_BUNDLE_MANAGER_PERMISSION_DENIED;
+    }
+    if (GetDistributedBundleMgr(networkId) == nullptr) {
+        APP_LOGW_NOFUNC("remote d-bms not running");
     }
 #ifdef HICOLLIE_ENABLE
     int timerId = HiviewDFX::XCollie::GetInstance().SetTimer("GetDistributedBundleName", LOCAL_TIME_OUT_SECONDS,

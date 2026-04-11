@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -52,6 +52,7 @@ ohos_shared_library("distributedbundle") {
     "bundle_framework:appexecfwk_base",
     "bundle_framework:libappexecfwk_common",
     "c_utils:utils",
+    "device_manager:devicemanagersdk",
     "hilog:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
