@@ -262,8 +262,8 @@ int32_t DistributedDataStorage::GetDistributedBundleName(const std::string &netw
             return OHOS::NO_ERROR;
         }
     }
-    APP_LOGE("get distributed bundleName no matching data: %{private}s %{private}s %{private}d",
-        networkId.c_str(), udid.c_str(), accessTokenId);
+    APP_LOGE("get distributed bundleName no matching data: %{public}s %{public}s %{public}d",
+        AnonymizeUdid(networkId).c_str(), AnonymizeUdid(udid).c_str(), accessTokenId);
     return ERR_BUNDLE_MANAGER_BUNDLE_NOT_EXIST;
 }
 
@@ -528,13 +528,13 @@ std::map<std::string, DistributedBundleInfo> DistributedDataStorage::GetAllOldDi
                 bundleNames.end()) {
                 APP_LOGW("bundleName:%{public}s need delete", distributedBundleInfo.bundleName.c_str());
                 if (kvStorePtr_->Delete(entry.key) != Status::SUCCESS) {
-                    APP_LOGE("Delete key:%{public}s failed", key.c_str());
+                    APP_LOGE("Delete key:%{public}s failed", AnonymizeUdid(key).c_str());
                 }
                 continue;
             }
             oldDistributedBundleInfos.emplace(distributedBundleInfo.bundleName, distributedBundleInfo);
         } else {
-            APP_LOGE("DistributionInfo FromJsonString key:%{public}s failed", key.c_str());
+            APP_LOGE("DistributionInfo FromJsonString key:%{public}s failed", AnonymizeUdid(key).c_str());
         }
     }
     return oldDistributedBundleInfos;
