@@ -36,7 +36,6 @@ public:
     double CalculateRatio(size_t fileSize, const std::string &imageType);
     ImageType GetImageType(const std::unique_ptr<uint8_t[]> &fileData, size_t fileLength);
     bool GetImageTypeString(const std::unique_ptr<uint8_t[]> &fileData, size_t fileLength, std::string &imageType);
-    bool GetImageFileInfo(const std::string &srcFile, std::unique_ptr<uint8_t[]> &fileContent, int64_t &fileLength);
     bool CompressImageByContent(const std::unique_ptr<uint8_t[]> &fileData, size_t fileSize,
         std::unique_ptr<uint8_t[]> &compressedData, int64_t &compressedSize, std::string &imageType);
 };
