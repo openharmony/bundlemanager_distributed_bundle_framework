@@ -107,37 +107,6 @@ bool ImageCompress::GetImageTypeString(const std::unique_ptr<uint8_t[]> &fileDat
     return true;
 }
 
-bool ImageCompress::GetImageFileInfo(const std::string &srcFile,
-    std::unique_ptr<uint8_t[]> &fileContent, int64_t &fileLength)
-{
-    if (!IsPathValid(srcFile)) {
-        APP_LOGE("%{public}s is unavailable", srcFile.c_str());
-        return false;
-    }
-    FILE* file = fopen(srcFile.c_str(), "rb");
-    if (!file) {
-        APP_LOGE("ImageCompress: GetImageTypeByFile %{public}s is unavailable", srcFile.c_str());
-        return false;
-    }
-    if (fseek(file, 0L, SEEK_END) != 0) {
-        fclose(file);
-        return false;
-    }
-    fileLength = ftell(file);
-    rewind(file);
-    fileContent = std::make_unique<uint8_t[]>(fileLength);
-    if (!fread(fileContent.get(), sizeof(uint8_t), fileLength, file)) {
-        APP_LOGE("read file failed!");
-        fclose(file);
-        return false;
-    }
-    if (fclose(file) != 0) {
-        APP_LOGE("close file failed!");
-        return false;
-    }
-    return true;
-}
-
 bool ImageCompress::CompressImageByContent(const std::unique_ptr<uint8_t[]> &fileData, size_t fileSize,
     std::unique_ptr<uint8_t[]> &compressedData, int64_t &compressedSize, std::string &imageType)
 {

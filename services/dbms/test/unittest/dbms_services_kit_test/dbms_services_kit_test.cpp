@@ -611,26 +611,6 @@ HWTEST_F(DbmsServicesKitTest, DbmsServicesKitTest_0033, Function | SmallTest | T
     }
 }
 
-/**
- * @tc.number: DbmsServicesKitTest
- * @tc.name: test GetImageFileInfo
- * @tc.require: issueI5MZ8V
- * @tc.desc: 1. system running normally
- *           2. test get image file info failed
- */
-HWTEST_F(DbmsServicesKitTest, DbmsServicesKitTest_0034, Function | SmallTest | TestSize.Level0)
-{
-    std::unique_ptr<ImageCompress> imageCompress = std::make_unique<ImageCompress>();
-    EXPECT_NE(imageCompress, nullptr);
-    if (imageCompress != nullptr) {
-        std::unique_ptr<uint8_t[]> fileContent;
-        int64_t fileLength;
-        bool res = imageCompress->
-            GetImageFileInfo(
-                HAP_FILE_PATH, fileContent, fileLength);
-        EXPECT_EQ(res, false);
-    }
-}
 #endif
 
 #ifdef HISYSEVENT_ENABLE
@@ -1165,53 +1145,8 @@ HWTEST_F(DbmsServicesKitTest, DbmsServicesKitTest_0065, Function | SmallTest | T
 }
 
 /**
- * @tc.number: DbmsServicesKitTest_0066
- * @tc.name: test GetImageFileInfo
- * @tc.desc: 1. system running normally
- *           2. test Get Image File Info (The srcFile parameter is invalid)
- */
-HWTEST_F(DbmsServicesKitTest, DbmsServicesKitTest_0066, Function | SmallTest | TestSize.Level0)
-{
-    std::unique_ptr<ImageCompress> imageCompress = std::make_unique<ImageCompress>();
-    EXPECT_NE(imageCompress, nullptr);
-    if (imageCompress != nullptr) {
-        std::unique_ptr<uint8_t[]> fileContent;
-        int64_t fileLength;
-        bool res = imageCompress->GetImageFileInfo(PATH_LOCATION, fileContent, fileLength);
-        EXPECT_EQ(res, false);
-    }
-}
-
-/**
- * @tc.number: DbmsServicesKitTest_0067
- * @tc.name: test GetImageFileInfo
- * @tc.desc: 1. system running normally
- *           2. test Get Image File Info (The srcFile parameter is valid)
- */
-HWTEST_F(DbmsServicesKitTest, DbmsServicesKitTest_0067, Function | SmallTest | TestSize.Level0)
-{
-    std::unique_ptr<ImageCompress> imageCompress = std::make_unique<ImageCompress>();
-    EXPECT_NE(imageCompress, nullptr);
-    std::fstream fs;
-    fs.open(PATH_LOCATIONS, std::ios_base::app);
-    fs.close();
-    std::ofstream ofs;
-    ofs.open(PATH_LOCATIONS, std::ios::out|std::ios::app);
-    ofs << "test" << " ";
-    ofs.close();
-    if (imageCompress != nullptr) {
-        int64_t fileLength = 64;
-        std::unique_ptr<uint8_t[]> fileContent = std::make_unique<uint8_t[]>(fileLength);
-        bool res = imageCompress->GetImageFileInfo(PATH_LOCATIONS, fileContent, fileLength);
-        EXPECT_EQ(res, true);
-    }
-    std::string savePath = PATH_LOCATIONS;
-    EXPECT_EQ(remove(savePath.c_str()), 0);
-}
-
-/**
  * @tc.number: DbmsServicesKitTest_0068
- * @tc.name: test GetImageFileInfo
+ * @tc.name: test CompressImageByContent
  * @tc.desc: 1. system running normally
  *           2. test CompressImageByContent (The fileData parameter is invalid)
  */
@@ -1232,7 +1167,7 @@ HWTEST_F(DbmsServicesKitTest, DbmsServicesKitTest_0068, Function | SmallTest | T
 
 /**
  * @tc.number: DbmsServicesKitTest_0069
- * @tc.name: test GetImageFileInfo
+ * @tc.name: test CompressImageByContent
  * @tc.desc: 1. system running normally
  *           2. test CompressImageByContent (The fileData parameter is valid)
  */
