@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "distributed_bms_host.h"
 #include "securec.h"
@@ -25,15 +26,11 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 constexpr size_t FOO_MAX_LEN = 1024;
 constexpr size_t U32_AT_SIZE = 4;
-constexpr size_t MESSAGE_SIZE = 10;
+constexpr uint32_t CODE_MAX = 11;
 
-uint32_t GetU32Data(const char* ptr)
+bool DoSomethingInterestingWithMyAPI(const char* data, size_t size, FuzzedDataProvider &fdp)
 {
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
-}
-bool DoSomethingInterestingWithMyAPI(const char* data, size_t size)
-{
-    uint32_t code = (GetU32Data(data) % MESSAGE_SIZE);
+    uint8_t code = fdp.ConsumeIntegralInRange<uint8_t>(0, CODE_MAX);
     MessageParcel datas;
     std::u16string descriptor = DistributedBmsHost::GetDescriptor();
     datas.WriteInterfaceToken(descriptor);
@@ -75,7 +72,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         ch = nullptr;
         return 0;
     }
-    OHOS::DoSomethingInterestingWithMyAPI(ch, size);
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DoSomethingInterestingWithMyAPI(ch, size, fdp);
     free(ch);
     ch = nullptr;
     return 0;
