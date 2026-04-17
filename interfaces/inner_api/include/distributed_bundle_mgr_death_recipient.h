@@ -18,17 +18,21 @@
 
 #include <string>
 
+#include "distributed_bundle_mgr_client.h"
 #include "iremote_object.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 class DistributedBundleMgrDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
+    explicit DistributedBundleMgrDeathRecipient(DistributedBundleMgrClient* client) : client_(client) {}
     /**
      * @brief Called when distributed bundle manager process died.
      * @return
      */
     virtual void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
+private:
+    DistributedBundleMgrClient* client_;
 };
 }  // namespace AppExecFwk
 }  // namespace OHOS

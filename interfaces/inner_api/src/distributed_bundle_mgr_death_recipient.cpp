@@ -22,8 +22,12 @@ namespace OHOS {
 namespace AppExecFwk {
 void DistributedBundleMgrDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
+    if (client_ == nullptr) {
+        APP_LOGE_NOFUNC("client_ is nullptr");
+        return;
+    }
     APP_LOGI_NOFUNC("d-bms died, remove the proxy object");
-    DistributedBundleMgrClient::GetInstance()->ResetDistributedBundleMgrProxy();
+    client_->ResetDistributedBundleMgrProxy();
 }
 }  // namespace AppExecFwk
 }  // namespace OHOS

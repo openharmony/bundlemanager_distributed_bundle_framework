@@ -177,7 +177,7 @@ sptr<IDistributedBms> DistributedBundleMgrClient::GetDistributedBundleMgrProxy()
         return nullptr;
     }
 
-    recipient_ = new (std::nothrow) DistributedBundleMgrDeathRecipient();
+    recipient_ = new (std::nothrow) DistributedBundleMgrDeathRecipient(this);
     if (recipient_ == nullptr) {
         APP_LOGE_NOFUNC("the death recipient is nullptr");
         return nullptr;
