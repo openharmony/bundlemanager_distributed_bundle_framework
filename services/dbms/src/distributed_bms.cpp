@@ -502,6 +502,10 @@ bool DistributedBms::CheckAclData(DistributedBmsAclInfo info)
 bool DistributedBms::GetMediaBase64(std::unique_ptr<uint8_t[]> &data, int64_t fileLength,
     std::string &imageType, std::string &value)
 {
+    if (fileLength <= 0) {
+        APP_LOGE_NOFUNC("GetMediaBase64 fileLength invalid");
+        return false;
+    }
     std::unique_ptr<char[]> base64Data = EncodeBase64(data, fileLength);
     value = "data:" + imageType + ";base64," + base64Data.get();
     return true;
