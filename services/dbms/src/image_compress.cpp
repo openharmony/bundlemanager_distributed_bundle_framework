@@ -147,11 +147,14 @@ bool ImageCompress::CompressImageByContent(const std::unique_ptr<uint8_t[]> &fil
     uint8_t *resultBuffer = reinterpret_cast<uint8_t *>(malloc(BUFFER_SIZE));
     if (resultBuffer == nullptr) {
         APP_LOGE("image packer malloc buffer failed.");
-        return 0;
+        return false;
     }
-    imagePacker.StartPacking(resultBuffer, BUFFER_SIZE, packOption);
-    imagePacker.AddImage(*pixMap);
-    imagePacker.FinalizePacking(compressedSize);
+    if (imagePacker.StartPacking(resultBuffer, BUFFER_SIZE, packOption) != Media::SUCCESS ||
+        imagePacker.AddImage(*pixMap) != Media::SUCCESS ||
+        imagePacker.FinalizePacking(compressedSize) != Media::SUCCESS) {
+        APP_LOGE_NOFUNC("StartPacking|AddImage|FinalizePacking failed");
+        return false;
+    }
     compressedData = std::make_unique<uint8_t[]>(compressedSize);
     APP_LOGD("compressedSize is %{public}d", static_cast<int32_t>(compressedSize));
     uint8_t *result = compressedData.get();
