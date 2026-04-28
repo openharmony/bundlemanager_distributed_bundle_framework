@@ -42,7 +42,6 @@ ohos_shared_library("dbms_fwk") {
     "src/distributed_bms_proxy.cpp",
     "src/distributed_bundle_mgr_client.cpp",
     "src/distributed_bundle_mgr_death_recipient.cpp",
-    "src/distributed_bundle_mgr_load_callback.cpp"
   ]
 
   defines = [
