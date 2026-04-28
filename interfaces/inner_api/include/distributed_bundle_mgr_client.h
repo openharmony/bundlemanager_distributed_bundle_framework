@@ -84,15 +84,10 @@ public:
     int32_t GetRemoteBundleVersionCode(const std::string &deviceId, const std::string &bundleName,
         uint32_t &versionCode);
 
-    void OnLoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject);
-
-    void OnLoadSystemAbilityFail();
-
     void ResetDistributedBundleMgrProxy();
 private:
     sptr<IDistributedBms> dProxy_;
     std::mutex dProxyMutex_;
-    std::condition_variable loadSaCondition_;
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_;
     std::mutex isInitMutex_;
     bool isInit_ = false;
