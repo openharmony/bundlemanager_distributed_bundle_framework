@@ -20,14 +20,13 @@
 #include "app_log_wrapper.h"
 #include "device_manager.h"
 #include "distributed_bundle_mgr_death_recipient.h"
-#include "distributed_bundle_mgr_load_callback.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
 namespace AppExecFwk {
 namespace {
-    constexpr int16_t LOAD_SA_TIMEOUT_MS = 10 * 1000;
+    constexpr int16_t LOAD_SA_TIMEOUT_MS = 4 * 1000;
     constexpr int32_t ERROR_DISTRIBUTED_SERVICE_NOT_RUNNING = 17700027;
     constexpr const char* PKG_NAME = "distributed_bundle_framework";
 }
@@ -133,20 +132,6 @@ int32_t DistributedBundleMgrClient::GetRemoteBundleVersionCode(const std::string
     return proxy->GetRemoteBundleVersionCode(deviceId, bundleName, versionCode);
 }
 
-void DistributedBundleMgrClient::OnLoadSystemAbilitySuccess(const sptr<IRemoteObject> &remoteObject)
-{
-    std::lock_guard<std::mutex> lock(dProxyMutex_);
-    dProxy_ = iface_cast<IDistributedBms>(remoteObject);
-    loadSaCondition_.notify_one();
-}
-
-void DistributedBundleMgrClient::OnLoadSystemAbilityFail()
-{
-    std::lock_guard<std::mutex> lock(dProxyMutex_);
-    dProxy_ = nullptr;
-    loadSaCondition_.notify_one();
-}
-
 void DistributedBundleMgrClient::ResetDistributedBundleMgrProxy()
 {
     std::lock_guard<std::mutex> lock(dProxyMutex_);
@@ -215,25 +200,13 @@ bool DistributedBundleMgrClient::LoadDistributedBundleMgrService()
         return false;
     }
     std::unique_lock<std::mutex> lock(dProxyMutex_);
-    sptr<DistributedBundleMgrLoadCallback> loadCallback = new (std::nothrow) DistributedBundleMgrLoadCallback(this);
-    if (loadCallback == nullptr) {
-        APP_LOGE_NOFUNC("create load callback failed");
-        return false;
+    sptr<IRemoteObject> remoteObject =
+        samgr->LoadSystemAbility(DISTRIBUTED_BUNDLE_MGR_SERVICE_SYS_ABILITY_ID, LOAD_SA_TIMEOUT_MS);
+    if (remoteObject != nullptr) {
+        dProxy_ = iface_cast<IDistributedBms>(remoteObject);
+        return true;
     }
-    ret = samgr->LoadSystemAbility(DISTRIBUTED_BUNDLE_MGR_SERVICE_SYS_ABILITY_ID, loadCallback);
-    if (ret != ERR_OK) {
-        APP_LOGE_NOFUNC("load system ability failed %{public}d", ret);
-        return false;
-    }
-    auto waitStatus = loadSaCondition_.wait_for(lock, std::chrono::milliseconds(LOAD_SA_TIMEOUT_MS),
-        [this]() {
-            return dProxy_ != nullptr;
-        });
-    if (!waitStatus) {
-        APP_LOGE_NOFUNC("wait for load sa timeout");
-        return false;
-    }
-    return true;
+    return false;
 }
 }
 }
