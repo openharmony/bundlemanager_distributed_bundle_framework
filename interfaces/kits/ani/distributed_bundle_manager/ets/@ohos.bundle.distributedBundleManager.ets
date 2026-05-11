@@ -32,7 +32,7 @@ export default namespace distributedBundleManager {
   const DEVICE_ID_ERROR: string = "BusinessError 401: Parameter error. The type of deviceId must be string.";
   const BUNDLE_NAME_ERROR: string = "BusinessError 401: Parameter error. The type of bundleName must be string.";
 
-  function createBusinessError(code: int, message: string) {
+  function createBusinessError(code: int, message: string): BusinessError {
     let err = new BusinessError();
     err.code = code;
     err.name = 'Error';
@@ -40,13 +40,13 @@ export default namespace distributedBundleManager {
     return err;
   }
 
-  function checkElementName(elementName: ElementName) {
+  function checkElementName(elementName: ElementName): void {
     if (elementName.deviceId === undefined) {
       throw createBusinessError(ERROR_PARAM_CHECK_ERROR, ELEMENT_NAME_ERROR);
     }
   }
 
-  function checkElementNames(elementNames: Array<ElementName>) {
+  function checkElementNames(elementNames: Array<ElementName>): void {
     if (elementNames.length === 0) {
       throw createBusinessError(ERROR_PARAM_CHECK_ERROR, ELEMENT_NAME_ERROR);
     }
